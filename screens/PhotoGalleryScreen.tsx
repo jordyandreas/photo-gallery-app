@@ -1,122 +1,40 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useCallback } from 'react';
 import { View, FlatList, StyleSheet, RefreshControl, Text } from 'react-native';
-import { Photo, fetchPhotos } from '../services/api';
+import { Photo } from '../services/api';
 import { PhotoItem } from '../components/PhotoItem';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorView } from '../components/ErrorView';
-import FavoriteConfirmationModule from '../native/FavoriteConfirmationModule';
+import { usePhotos } from '../hooks/usePhotos';
+import { useFavorites } from '../hooks/useFavorites';
 
 const GAP = 8;
 const COLUMNS = 2;
 
 export const PhotoGalleryScreen: React.FC = () => {
-  const [photos, setPhotos] = useState<Photo[]>([]);
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const isLoadingRef = useRef(false);
+  const {
+    photos,
+    loading,
+    refreshing,
+    loadingMore,
+    error,
+    handleRefresh,
+    handleLoadMore,
+    retry,
+  } = usePhotos();
 
-  const loadPhotos = useCallback(
-    async (pageNum: number, reset: boolean = false) => {
-      // Prevent duplicate requests
-      if (isLoadingRef.current) {
-        return;
-      }
-
-      try {
-        isLoadingRef.current = true;
-        setError(null);
-        if (reset) {
-          setLoading(true);
-        } else {
-          setLoadingMore(true);
-        }
-
-        const response = await fetchPhotos(pageNum, 20);
-
-        if (reset) {
-          setPhotos(response.photos);
-        } else {
-          setPhotos(prev => [...prev, ...response.photos]);
-        }
-
-        setHasMore(response.hasMore);
-        setPage(pageNum);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load photos');
-      } finally {
-        setLoading(false);
-        setRefreshing(false);
-        setLoadingMore(false);
-        isLoadingRef.current = false;
-      }
-    },
-    [],
-  );
-
-  useEffect(() => {
-    loadPhotos(1, true);
-  }, [loadPhotos]);
-
-  const handleRefresh = useCallback(() => {
-    setRefreshing(true);
-    setPage(1);
-    setHasMore(true);
-    loadPhotos(1, true);
-  }, [loadPhotos]);
-
-  const handleLoadMore = useCallback(() => {
-    if (loadingMore || loading || !hasMore) {
-      return;
-    }
-
-    loadPhotos(page + 1, false);
-  }, [loadingMore, loading, hasMore, page, loadPhotos]);
-
-  const handleFavoritePress = useCallback((photoId: string) => {
-    setFavorites(prev => {
-      const newFavorites = new Set(prev);
-      const wasFavorite = newFavorites.has(photoId);
-
-      if (wasFavorite) {
-        newFavorites.delete(photoId);
-      } else {
-        newFavorites.add(photoId);
-      }
-
-      const message = wasFavorite
-        ? 'Image removed from favorites'
-        : 'Image added to favorites';
-
-      if (FavoriteConfirmationModule && FavoriteConfirmationModule.showToast) {
-        try {
-          FavoriteConfirmationModule.showToast(message);
-        } catch (err) {
-          console.error('Error showing toast:', err);
-        }
-      } else {
-        console.log('FavoriteConfirmationModule not available');
-      }
-
-      return newFavorites;
-    });
-  }, []);
+  const { isFavorite, toggleFavorite } = useFavorites();
 
   const renderItem = useCallback(
     ({ item }: { item: Photo }) => {
       return (
         <PhotoItem
           photo={item}
-          isFavorite={favorites.has(item.id)}
-          onPress={() => handleFavoritePress(item.id)}
+          isFavorite={isFavorite(item.id)}
+          onPress={() => toggleFavorite(item.id)}
         />
       );
     },
-    [favorites, handleFavoritePress],
+    [isFavorite, toggleFavorite],
   );
 
   const renderFooter = useCallback(() => {
@@ -135,7 +53,7 @@ export const PhotoGalleryScreen: React.FC = () => {
   if (error && photos.length === 0) {
     return (
       <View style={styles.container}>
-        <ErrorView message={error} onRetry={() => loadPhotos(1, true)} />
+        <ErrorView message={error} onRetry={retry} />
       </View>
     );
   }
