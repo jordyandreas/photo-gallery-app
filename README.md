@@ -66,4 +66,16 @@ Implementasi difokuskan pada Android, karena requirement native bridge bersifat 
 ```bash
 npm install
 npx react-native run-android
+```
 
+## Screen Recording
+Video singkat yang memperlihatkan:
+- Tampilan grid foto 2 kolom
+- Infinite scroll (pagination)
+- Pull-to-refresh
+- Favorite dan unfavorite gambar
+- Konfirmasi menggunakan Android native Toast
+- Loading state saat fetch data
+- Error handling dan mekanisme retry ketika request gagal
+
+[link screen recording](https://drive.google.com/file/d/1-0wcirvHulxiRxr-yNrE89eU2hFTd4Da/view?usp=sharing)
