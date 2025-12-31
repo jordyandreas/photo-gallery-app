@@ -1,6 +1,16 @@
 # Photo Gallery App
 Aplikasi ini merupakan Photo Gallery berbasis React Native yang menampilkan daftar gambar dari public API (Lorem Picsum). Aplikasi mendukung infinite scroll, fitur favorite gambar, serta menampilkan konfirmasi menggunakan Toast native Android melalui custom native module berbasis Kotlin.
 
+## List Performance Optimization
+Beberapa optimasi performa yang diterapkan pada FlatList:
+- Menggunakan pagination (20 item per request) untuk menghindari render data berlebih.
+- Mencegah duplicate network request dengan guard dan ref lock pada proses fetch data.
+- Mengatur properti FlatList seperti `initialNumToRender`, `windowSize`, dan `maxToRenderPerBatch` untuk menjaga scrolling tetap smooth.
+- Menggunakan `useCallback` untuk meminimalkan re-render pada item list.
+- Menggunakan struktur data `Set` untuk manajemen favorite agar lookup tetap efisien.
+
+-------------------------------------------------------------
+
 ## Fitur Utama
 - Grid foto 2 kolom
 - Infinite scroll (pagination)
