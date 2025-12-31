@@ -26,7 +26,8 @@ Beberapa optimasi performa yang diterapkan pada FlatList:
 - Lorem Picsum API
 
 ## Struktur Proyek
-```src/
+```
+src/
 ├─ screens/ // Screen utama aplikasi
 ├─ components/ // Reusable UI components
 ├─ services/ // API & data fetching
@@ -56,13 +57,6 @@ Flow:
 3. Android Toast ditampilkan menggunakan `android.widget.Toast`
 
 Native module dipanggil setiap kali user melakukan favorite atau unfavorite gambar.
-
-## Performa & Optimasi
-Beberapa optimasi yang diterapkan:
-- Konfigurasi FlatList (windowSize, maxToRenderPerBatch, initialNumToRender)
-- Penggunaan useCallback untuk mencegah re-render tidak perlu
-- Penggunaan Set untuk manajemen favorite
-- Penggunaan useRef sebagai lock untuk mencegah overlap request async
 
 ## Error Handling & Loading State
 - Loading spinner ditampilkan saat data sedang dimuat
