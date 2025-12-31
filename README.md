@@ -63,9 +63,6 @@ Native module dipanggil setiap kali user melakukan favorite atau unfavorite gamb
 - Error Handling menggunakan tombol retry jika gagal saat request API
 - Empty state ditampilkan ketika data kosong
 
-## Platform
-Implementasi difokuskan pada Android, karena requirement native bridge bersifat Android-specific.  
-
 ## Cara Menjalankan Aplikasi
 ```bash
 npm install
